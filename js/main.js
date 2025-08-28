@@ -73,6 +73,7 @@ document.querySelectorAll('.btn-show-bio').forEach(btn => {
         const overlay = document.getElementById(btn.getAttribute('data-target'));
         overlay.classList.add('active');
         document.body.classList.add('no-scroll');
+        document.querySelector('.navbar-light').classList.add('hidden');
         $(document.querySelector('.back-to-top')).fadeOut('fast');
         overlay.scrollTop = 0;
     });
@@ -89,6 +90,7 @@ document.querySelectorAll('.btn-close-bio').forEach(btn => {
             overlay.style.opacity = '';
         }, 400);
         document.body.classList.remove('no-scroll');
+        document.querySelector('.navbar-light').classList.remove('hidden');
         $(document.querySelector('.back-to-top')).fadeIn('fast');
         window.scrollTo(0, scrollPos);
     });
@@ -101,27 +103,11 @@ filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         filterBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
-
         const filter = btn.dataset.filter;
-
         cards.forEach(card => {
             if (filter === 'all' || card.dataset.type === filter) card.classList.remove('hidden');
             else card.classList.add('hidden');
         });
-    });
-});
-document.querySelectorAll('.btn-show-bio').forEach(btn => {
-    btn.addEventListener('click', function(){
-        const target = this.getAttribute('data-target');
-        document.getElementById(target).classList.add('active');
-        document.body.classList.add('no-scroll');
-    });
-});
-
-document.querySelectorAll('.btn-close-bio').forEach(btn => {
-    btn.addEventListener('click', function(){
-        this.closest('.bio-overlay').classList.remove('active');
-        document.body.classList.remove('no-scroll');
     });
 });
 
@@ -213,6 +199,7 @@ document.addEventListener("click",e=>{
     modalSub.textContent=`${formatDate(ev.start)} · ${ev.location}`;
     modalBody.innerHTML=`<p>${ev.description}</p>`;
     regBtn.href=ev.register;
+    document.querySelector('.navbar-light').classList.add('hidden');
     gcal.onclick=()=>window.open(`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(ev.title)}&dates=${new Date(ev.start).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}/${new Date(ev.end).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}&location=${encodeURIComponent(ev.location)}&details=${encodeURIComponent(ev.description)}`,"_blank");
     ics.onclick=()=>{
       const content=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${ev.title}\nDTSTART:${new Date(ev.start).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}\nDTEND:${new Date(ev.end).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}\nDESCRIPTION:${ev.description}\nLOCATION:${ev.location}\nEND:VEVENT\nEND:VCALENDAR`;
@@ -220,6 +207,9 @@ document.addEventListener("click",e=>{
       const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=ev.id+".ics";a.click();
     };
   }
+});
+document.getElementById("eventModal").addEventListener("hidden.bs.modal",()=>{
+  document.querySelector('.navbar-light').classList.remove('hidden');
 });
 toggleBtn.onclick=()=>{
   toggleBtn.dataset.view=toggleBtn.dataset.view==="grid"?"list":"grid";
