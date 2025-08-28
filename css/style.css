@@ -6,7 +6,7 @@
     z-index: 99;
 }
 .back-to-top:hover {
-    background-color: #0056b3; /* azul más oscuro al pasar el cursor */
+    background-color: #0056b3;
 }
 .btn {
     font-weight: 600;
@@ -808,7 +808,7 @@
 /*Fin noticias*/
 
 
-/* Voluntariado - estilos */
+/* Voluntariado inicio */
 #voluntariado { background: #ffffff; }
 #voluntariado .info-card,
 #voluntariado .cta-card {
@@ -908,8 +908,7 @@
     z-index: 99;
 }
 
-/* Estilo para los enlaces de idioma */
-/* Enlaces de idioma solo con color de texto */
+
 .idioma-simple {
     display: flex;
     align-items: center;
