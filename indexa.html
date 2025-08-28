@@ -543,8 +543,6 @@
             </div>
         </div>
 
-
-      <!--Calendario-->
         <div id="eventos" class="container-fluid bg-light py-5">
             <div class="container py-4">
                 <div class="d-flex flex-column flex-md-row align-items-start justify-content-between mb-3">
@@ -564,9 +562,6 @@
             </div>
         </div>
 
-
-
-      <!-- Modal Bootstrap -->
         <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
             <div class="modal-dialog modal-lg modal-dialog-scrollable">
                 <div class="modal-content rounded-3 shadow">
@@ -586,156 +581,57 @@
                 </div>
             </div>
         </div>
-
-
-<script>
-// === DATA ===
-const EVENTS = [
-  { id:"e1", title:"Yatiñ Qillqañani", start:"2025-08-30T09:00:00", end:"2025-08-30T13:00:00", location:"Ayllu Uta - La Paz", short:"Presencial yatiyawinaka, material ukan certificado.", description:"Jach’a capacitación simulacros ukhamaraki. DNI u qillqata ukhamarak uñtawi.", register:"https://forms.gle/FORM1" },
-  { id:"e2", title:"Mesa Delegadonakampi Webinar", start:"2025-09-12T18:00:00", end:"2025-09-12T19:30:00", location:"Zoom", short:"Online aruskipañani, preguntas ukhamaraki respuestas.", description:"Aruskipañani en vivo material ukampis descarga ukhamaraki evaluación.", register:"https://forms.gle/FORM2" },
-  { id:"e3", title:"Yatiyawinaka Feria", start:"2025-10-03T10:00:00", end:"2025-10-03T14:00:00", location:"Plaza Central - El Alto", short:"Stand informativo ukhamaraki voluntarios.", description:"Voluntarios logística ukhamaraki difusión ukhamarak amuyt’añani.", register:"https://forms.gle/FORM3" }
-];
-
-const monthNames = ["Ene","Feb","Mar","Abr","May","Jun","Jul","Ago","Sep","Oct","Nov","Dic"];
-const wrap = document.getElementById("events-wrap");
-const filter = document.getElementById("filter-month");
-const toggleBtn = document.getElementById("toggle-view");
-
-// === HELPERS ===
-function formatDate(iso, type="short"){
-  return new Date(iso).toLocaleString("es-BO", type==="short"
-    ? { dateStyle:"medium", timeStyle:"short" }
-    : { dateStyle:"full", timeStyle:"short" });
-}
-function dateParts(iso){
-  const d=new Date(iso); 
-  return { day:d.getDate().toString().padStart(2,"0"), month:monthNames[d.getMonth()] };
-}
-
-// === RENDER ===
-function renderEvents(view="grid", month="all"){
-  wrap.innerHTML="";
-  const now = Date.now();
-  const list = EVENTS.filter(e=> new Date(e.end)>=now).sort((a,b)=>new Date(a.start)-new Date(b.start));
-  const filtered = month==="all"? list : list.filter(e=>new Date(e.start).getMonth()===+month);
-  if(!filtered.length){ wrap.innerHTML=`<p class="text-muted">Jichha jan wali amuyt’añani.</p>`; return; }
-
-  filtered.forEach(ev=>{
-    const date=dateParts(ev.start);
-    let html=`  
-      <div class="${view==="grid"?"col-md-6 col-lg-4": "col-12"}">
-        <div class="bg-white rounded-3 shadow-sm p-3 d-flex gap-3 h-100">
-          <div class="text-center bg-light rounded-3 p-2" style="min-width:72px">
-            <div class="fw-bold fs-4">${date.day}</div>
-            <div class="text-muted small text-uppercase">${date.month}</div>
-          </div>
-          <div class="flex-grow-1 d-flex flex-column">
-            <h5 class="mb-1">${ev.title}</h5>
-            <p class="text-muted small mb-1">${formatDate(ev.start)} · ${ev.location}</p>
-            <p class="mb-2">${ev.short}</p>
-            <div class="mt-auto d-flex gap-2 flex-wrap">
-              <button class="btn btn-outline-danger btn-sm" data-id="${ev.id}" data-bs-toggle="modal" data-bs-target="#eventModal">Jichha aruskipañani</button>
-              <a class="btn btn-secondary btn-sm" href="${ev.register}" target="_blank">Jichhaña Inscripción</a>
-            </div>
-          </div>
-        </div>
-      </div>`;
-    wrap.insertAdjacentHTML("beforeend",html);
-  });
-}
-
-// === MONTH FILTER ===
-[...new Set(EVENTS.map(e=>new Date(e.start).getMonth()))]
-  .sort((a,b)=>a-b)
-  .forEach(m=>{
-    filter.insertAdjacentHTML("beforeend",`<option value="${m}">${monthNames[m]}</option>`);
-  });
-
-// === EVENT MODAL ===
-const modalTitle=document.getElementById("eventModalLabel");
-const modalSub=document.getElementById("eventModalSub");
-const modalBody=document.getElementById("eventModalBody");
-const regBtn=document.getElementById("eventRegister");
-const gcal=document.getElementById("addGcal");
-const ics=document.getElementById("downloadIcs");
-
-document.addEventListener("click",e=>{
-  if(e.target.dataset.id){
-    const ev=EVENTS.find(x=>x.id===e.target.dataset.id);
-    modalTitle.textContent=ev.title;
-    modalSub.textContent=`${formatDate(ev.start)} · ${ev.location}`;
-    modalBody.innerHTML=`<p>${ev.description}</p>`;
-    regBtn.href=ev.register;
-    gcal.onclick=()=>window.open(`https://calendar.google.com/calendar/r/eventedit?text=${encodeURIComponent(ev.title)}&dates=${new Date(ev.start).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}/${new Date(ev.end).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}&location=${encodeURIComponent(ev.location)}&details=${encodeURIComponent(ev.description)}`,"_blank");
-    ics.onclick=()=>{
-      const content=`BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nSUMMARY:${ev.title}\nDTSTART:${new Date(ev.start).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}\nDTEND:${new Date(ev.end).toISOString().replace(/[-:]/g,"").split(".")[0]+"Z"}\nDESCRIPTION:${ev.description}\nLOCATION:${ev.location}\nEND:VEVENT\nEND:VCALENDAR`;
-      const blob=new Blob([content],{type:"text/calendar"});
-      const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=ev.id+".ics";a.click();
-    };
-  }
-});
-
-// === TOGGLE & INIT ===
-toggleBtn.onclick=()=>{
-  toggleBtn.dataset.view=toggleBtn.dataset.view==="grid"?"list":"grid";
-  toggleBtn.textContent="Vista: "+(toggleBtn.dataset.view==="grid"?"Tarjetas":"Lista");
-  renderEvents(toggleBtn.dataset.view,filter.value);
-};
-filter.onchange=()=>renderEvents(toggleBtn.dataset.view,filter.value);
-
-renderEvents();
-</script>
-      
-<div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
-    <div class="container py-5">
-        <div class="row gy-5 justify-content-center">
-            <div class="col-sm-6 col-lg-4">
-                <div class="d-flex flex-column align-items-start mb-3 lowered">
-                    <img src="img/logo-2.png"
-                        alt="Alianza Libre"
-                        style="height: 40px; margin-bottom: 0.25rem;">
-                    <p class="text-body mb-0">
-                    “Qhipa pachpa jach’aqaña jichha tiempo uñt’aña<br>
-                    aka jach’a qillqañani. Ukhamawa LIBRE uñt’aña.”
-                    </p>
+     
+        <div class="container-fluid footer py-5 wow fadeIn" data-wow-delay="0.2s">
+            <div class="container py-5">
+                <div class="row gy-5 justify-content-center">
+                    <div class="col-sm-6 col-lg-4">
+                        <div class="d-flex flex-column align-items-start mb-3 lowered">
+                            <img src="img/logo-2.png"
+                                alt="Alianza Libre"
+                                style="height: 40px; margin-bottom: 0.25rem;">
+                            <p class="text-body mb-0">
+                            “Qhipa pachpa jach’aqaña jichha tiempo uñt’aña<br>
+                            aka jach’a qillqañani. Ukhamawa LIBRE uñt’aña.”
+                            </p>
+                        </div>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <h4 class="text-white mb-3">Aruskipañani</h4>
+                        <p class="text-body mb-1"><i class="fas fa-map-marker-alt me-2"></i> La Paz, Bolivia</p>
+                        <p class="text-body mb-1"><i class="fas fa-phone me-2"></i>+591 -------</p>
+                        <p class="text-body mb-1"><i class="fas fa-envelope me-2"></i>info@-----</p>
+                    </div>
+                    <div class="col-sm-6 col-lg-4">
+                        <h4 class="text-white mb-3">Ch’iqt’awinaka</h4>
+                        <ul class="list-unstyled">
+                            <li><a href="#inicio" class="text-body"><i class="fas fa-angle-right me-2"></i>Qhipa Uta</a></li>
+                            <li><a href="#plan" class="text-body"><i class="fas fa-angle-right me-2"></i>Gobierno Qillqañani</a></li>
+                            <li><a href="#candidatos" class="text-body"><i class="fas fa-angle-right me-2"></i>Uñt’awinakampi</a></li>
+                            <li><a href="#noticias" class="text-body"><i class="fas fa-angle-right me-2"></i>Noticias</a></li>
+                            <li><a href="#" class="text-body"><i class="fas fa-angle-right me-2"></i>Jichhaña</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="row social-row">
+                    <div class="col-12 text-center">
+                        <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-facebook-f"></i></a>
+                        <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-tiktok"></i></a>
+                        <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-instagram"></i></a>
+                        <a class="btn btn-secondary btn-md-square rounded-circle" href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 text-center text-body mt-4">
+                        © 2025 Alianza Libre • Tayka amtaña uñt’añani
+                    </div>
                 </div>
             </div>
-            <div class="col-sm-6 col-lg-4">
-                <h4 class="text-white mb-3">Aruskipañani</h4>
-                <p class="text-body mb-1"><i class="fas fa-map-marker-alt me-2"></i> La Paz, Bolivia</p>
-                <p class="text-body mb-1"><i class="fas fa-phone me-2"></i>+591 -------</p>
-                <p class="text-body mb-1"><i class="fas fa-envelope me-2"></i>info@-----</p>
-            </div>
-            <div class="col-sm-6 col-lg-4">
-                <h4 class="text-white mb-3">Ch’iqt’awinaka</h4>
-                <ul class="list-unstyled">
-                    <li><a href="#inicio" class="text-body"><i class="fas fa-angle-right me-2"></i>Qhipa Uta</a></li>
-                    <li><a href="#plan" class="text-body"><i class="fas fa-angle-right me-2"></i>Gobierno Qillqañani</a></li>
-                    <li><a href="#candidatos" class="text-body"><i class="fas fa-angle-right me-2"></i>Uñt’awinakampi</a></li>
-                    <li><a href="#noticias" class="text-body"><i class="fas fa-angle-right me-2"></i>Noticias</a></li>
-                    <li><a href="#" class="text-body"><i class="fas fa-angle-right me-2"></i>Jichhaña</a></li>
-                </ul>
-            </div>
         </div>
-        <div class="row social-row">
-            <div class="col-12 text-center">
-                <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-facebook-f"></i></a>
-                <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-tiktok"></i></a>
-                <a class="btn btn-secondary btn-md-square rounded-circle me-3" href="#"><i class="fab fa-instagram"></i></a>
-                <a class="btn btn-secondary btn-md-square rounded-circle" href="#"><i class="fab fa-youtube"></i></a>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-12 text-center text-body mt-4">
-                © 2025 Alianza Libre • Tayka amtaña uñt’añani
-            </div>
-        </div>
-    </div>
-</div>
 
-<a href="#inicio" class="btn btn-secondary btn-lg-square rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
-<a href="https://chatgpt.com/g/g-67e3fe14c71c8191844fa99fe1ee3162-libre-al-cambio" target="_blank" class="btn btn-danger btn-lg-square rounded-circle chatgpt-btn"><i class="fa fa-robot"></i>
-</a>
+        <a href="#inicio" class="btn btn-secondary btn-lg-square rounded-circle back-to-top"><i class="fa fa-arrow-up"></i></a>   
+        <a href="https://chatgpt.com/g/g-67e3fe14c71c8191844fa99fe1ee3162-libre-al-cambio" target="_blank" class="btn btn-danger btn-lg-square rounded-circle chatgpt-btn"><i class="fa fa-robot"></i>
+        </a>
 
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
